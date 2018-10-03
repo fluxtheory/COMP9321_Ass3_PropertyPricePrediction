@@ -1,14 +1,12 @@
-<center>
+
 ![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT6lTTFRu0mNIQL39fTYe8c3fCRdmpdVYq8Z_2v-WyE2dhTmdQIVw)
-</center>
+
 
 # Melb Property Price Prediction
 
 ## Introduction
 
-<center>
 ![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZsltWS_lmdGAT3yI8NNWzd39JwgHOo0VJyBnKLph3FcwHwP6_)
-</center>
 
 ## Tasks
  - **Dataset Collection**: Xavier Yan
