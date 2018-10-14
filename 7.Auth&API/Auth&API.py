@@ -1,4 +1,3 @@
-
 import json
 from functools import wraps
 from time import time
@@ -119,7 +118,7 @@ class Token(Resource):
 
 
 @api.route('/Property')
-class BooksList(Resource):
+class PropertyList(Resource):
     @api.response(200, 'Successful')
     @api.doc(description="Get all property")
     @requires_auth
@@ -175,7 +174,7 @@ class BooksList(Resource):
 
 @api.route('/property/<int:id>')
 @api.param('id', 'The Property identifier')
-class Books(Resource):
+class Property(Resource):
     @api.response(404, 'Property was not found')
     @api.response(200, 'Successful')
     @api.doc(description="Get a property by its ID")
@@ -207,7 +206,7 @@ class Books(Resource):
     def put(self, id):
 
         if id not in df.index:
-            api.abort(404, "Book {} doesn't exist".format(id))
+            api.abort(404, "Property {} doesn't exist".format(id))
 
         # get the payload and convert it to a JSON
         property = request.json
@@ -224,7 +223,7 @@ class Books(Resource):
             df.loc[id, key] = property[key]
 
         df.append(property, ignore_index=True)
-        return {"message": "Book {} has been successfully updated".format(id)}, 200
+        return {"message": "Property {} has been successfully updated".format(id)}, 200
 
 
 if __name__ == '__main__':
