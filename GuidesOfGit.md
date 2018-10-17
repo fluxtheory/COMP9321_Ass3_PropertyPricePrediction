@@ -31,7 +31,7 @@ There is another important thing you need to do, update your local repo to the l
 
 You can use 
 
- - `git remote upstream https://github.com//username_you_forked//repo_your_fork.git` add remote connection
+ - `git remote add upstream https://github.com//username_you_forked//repo_your_fork.git` add remote connection
  - `git fetch upstream master` get latest repo
  - `git checkout master` switch to master branch
  - `git merge upstream/master` merge latest one into your local repo
