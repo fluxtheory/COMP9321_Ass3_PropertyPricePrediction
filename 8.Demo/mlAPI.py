@@ -76,7 +76,7 @@ class PropertyPricePrediction():
         # save some regarding charts
         os.chdir('./images')
         # chart 1:
-        name = f'Average Price of {self.env[1]} in different Regions'
+        name = f'Average Price Of {self.env[1]} In Different Regions'
         if not os.path.exists(name + '.png'):
             CSV1 = train[['Regionname', 'Landsize', 'Price', 'Type']]
             CSV1 = CSV1[CSV1['Type'] == self.type]
@@ -86,37 +86,43 @@ class PropertyPricePrediction():
             try:
                 CSV1.plot.bar()
                 plt.tight_layout()
+                plt.ylabel('Unit: $/m²')
                 plt.title(name)
                 plt.savefig(name + '.png')
             except:
                 pass
 
-        # chart 2:
-        name = f'{self.sellerG}\'s Sales'
+        # chart 2: the average pricein different council area
+        name = f'Average Price Of {self.type} In Different Council Area'
         if not os.path.exists(name + '.png'):
             plt.rcdefaults()
-            CSV3 = train[train['SellerG'] == self.sellerG]
-            CSV3 = CSV3.groupby(by = ['SellerG', "Sold_Year"]).size()
-            CSV3.reset_index(name = 'times')
+            CSV3 = train[['CouncilArea', 'Landsize', 'Price', 'Type']]
+            CSV3 = CSV3[CSV3['Type'] == self.type]
+            CSV3 = CSV3.groupby('CouncilArea').sum()
+            CSV3['Avg'] = CSV3.apply(lambda x: x.Price / x.Landsize, axis = 1)
+            CSV3 = CSV3['Avg']
             try:
                 CSV3.plot.bar()
                 plt.tight_layout()
-                plt.xticks(rotation = 360)
+                plt.ylabel('Unit: $/m²')
                 plt.title(name)
                 plt.savefig(name + '.png')
             except:
                 pass
 
-        # chart 3: seller's sales values in different year
-        name = f'{self.sellerG}\'s Sales'
+        # chart 3: the average price of council area in different year
+        name = f'Average Price Of {self.type} Over Years'
         if not os.path.exists(name + '.png'):
             plt.rcdefaults()
-            CSV3 = train[train['SellerG'] == self.sellerG]
-            CSV3 = CSV3.groupby(by = ['SellerG', "Sold_Year"]).size()
-            CSV3.reset_index(name = 'times')
+            CSV3 = train[['Sold_Year', 'Landsize', 'Price', 'Type']]
+            CSV3 = CSV3[CSV3['Type'] == self.type]
+            CSV3 = CSV3.groupby('Sold_Year').sum()
+            CSV3['Avg'] = CSV3.apply(lambda x: x.Price / x.Landsize, axis = 1)
+            CSV3 = CSV3['Avg']
             try:
                 CSV3.plot.bar()
-                plt.xticks(rotation = 360)
+                plt.tight_layout()
+                plt.ylabel('Unit: $/m²')
                 plt.title(name)
                 plt.savefig(name + '.png')
             except:
@@ -239,5 +245,6 @@ if __name__ == '__main__':
     ppp = PropertyPricePrediction()
     env = [3,'House','S','Greg','None',2.5,2.0,0.0,134.0,'Yarra City Council']
     ppp.setArgs(env)
+    print("Start to predict")
     price = ppp.predict()
     print('The price of this property is: AUD$',price[0])
