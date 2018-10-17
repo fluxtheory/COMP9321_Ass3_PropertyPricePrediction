@@ -38,7 +38,7 @@ class PropertyPricePrediction():
             print('Only find raw data, we are going to processing it.')
             # cleaning data first then return clean data
             self.processing()
-            train = pd.read_csv('train.csv')
+            self.train = pd.read_csv('train.csv')
 
     def setArgs(self, env):
         self.env = env
@@ -235,6 +235,7 @@ if __name__ == '__main__':
     # Car              float64
     # LandSize         float64
     # CouncilArea      string
+
     ppp = PropertyPricePrediction()
     env = [3,'House','S','Greg','None',2.5,2.0,0.0,134.0,'Yarra City Council']
     ppp.setArgs(env)
