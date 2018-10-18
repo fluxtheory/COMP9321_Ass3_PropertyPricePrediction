@@ -87,8 +87,10 @@ class PropertyPricePrediction():
         else:
             os.mkdir('images')
             os.chdir('./images')
+
+        dictionary = {'h':'House','u':'Unit','t':'Townhouse','dev site':'Development Site','o res':'Other Residential'}
         # chart 1:
-        name = f'Average Price Of {self.env[1]} In Different Regions'
+        name = f'Average Price Of {dictionary[self.env[1]]} In Different Regions'
         if not os.path.exists(name + '.png'):
             CSV1 = train[['Regionname', 'Landsize', 'Price', 'Type']]
             CSV1 = CSV1[CSV1['Type'] == self.type]
@@ -105,7 +107,7 @@ class PropertyPricePrediction():
                 pass
 
         # chart 2: the average pricein different council area
-        name = f'Average Price Of {self.type} In Different Council Area'
+        name = f'Average Price Of {dictionary[self.type]} In Different Council Area'
         if not os.path.exists(name + '.png'):
             plt.rcdefaults()
             CSV3 = train[['CouncilArea', 'Landsize', 'Price', 'Type']]
@@ -123,7 +125,7 @@ class PropertyPricePrediction():
                 pass
 
         # chart 3: the average price of council area in different year
-        name = f'Average Price Of {self.type} Over Years'
+        name = f'Average Price Of {dictionary[self.type]} Over Years'
         if not os.path.exists(name + '.png'):
             plt.rcdefaults()
             CSV3 = train[['Sold_Year', 'Landsize', 'Price', 'Type']]
@@ -267,5 +269,5 @@ if __name__ == '__main__':
     ppp.setArgs(env)
     print("Start to predict")
     price = ppp.predict()
-    print('The price of this property is: AUD$',round(price[0],2))
+    print('The price of this property is: AUD$',round(price[0]))
     # Yarra City Council ,  Port Phillip City Council
