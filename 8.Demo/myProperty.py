@@ -3,20 +3,26 @@
 from flask import Flask, render_template, redirect, url_for, flash, request, session
 from flask_bootstrap import Bootstrap
 from flask_restplus import reqparse
+#from mlAPI import PropertyPricePrediction
 from wtforms import *
 from flask_wtf import FlaskForm
 from wtforms.validators import *
 import requests
 import json
 import unicodedata
+import re
+import os.path
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '3141592653589793238462643383279502884197169399'    # for CSRF
 bootstrap = Bootstrap(app)
 
+#ppp = PropertyPricePrediction()
+
 parser = reqparse.RequestParser()
 parser.add_argument('address',required=True)
 parser.add_argument('landsize', required=True)
+parser.add_argument('distance', required=True)
 parser.add_argument('council')
 parser.add_argument('type', required=True)
 parser.add_argument('bedrooms')
@@ -111,9 +117,10 @@ melb_councils = [("Alpine Shire","Alpine Shire"),
 
 class SearchForm(FlaskForm):
     address = StringField('Address', validators=[DataRequired()])
+    distance = IntegerField('Distance to CBD', validators=[DataRequired()])
     council = SelectField('Council', validators=[Optional()], choices=melb_councils, default="")
     landsize = IntegerField('Landsize', validators=[InputRequired(), NumberRange(min=1, max=9999, message="Please provide a valid number")])
-    property_type = SelectField('Type', validators=[DataRequired()], choices=[('House','House'), ('Flat','Flat'),('Unit','Unit')])
+    property_type = SelectField('Type', validators=[DataRequired()], choices=[('House','House'), ('Unit','Unit'), ('Other','Other')])
     num_bedroom = SelectField('Bedrooms', validators=[Optional()], choices=[("",""),('1','1'),('2','2'),('3','3'),('4','4')], default="")
     num_bathroom = SelectField('Bathrooms', validators=[Optional()], choices=[("",""),('1','1'),('2','2'),('3','3')], default="")
     num_garage = SelectField('Garage Spaces', validators=[Optional()], choices=[("",""),('0','0'),('1','1'),('2','2')], default="")
@@ -127,8 +134,8 @@ def login():
         if form.validate_on_submit():
             if request.form['username'] == 'admin' and \
                request.form['password'] == 'password':
-                flash('Login requested for user {}, remember_me={}'.format(
-                form.username.data, form.remember_me.data))
+                #flash('Login requested for user {}, remember_me={}'.format(
+                #form.username.data, form.remember_me.data))
                 session.clear()
                 return redirect(url_for('searchpage', name=form.username.data))
             else :
@@ -148,7 +155,7 @@ def searchpage():
                 form.num_bedroom.data, form.num_bathroom.data, form.num_garage.data))
             session.clear()
             return redirect(url_for('resultpage', address=form.address.data, landsize=form.landsize.data, council=form.council.data, \
-            type=form.property_type.data, bedrooms=form.num_bedroom.data, bathrooms=form.num_bathroom.data, garage=form.num_garage.data))
+            type=form.property_type.data, bedrooms=form.num_bedroom.data, bathrooms=form.num_bathroom.data, garage=form.num_garage.data, distance=form.distance.data))
         else:
             flash('Retrieving prediction for address={} Council={} Landsize={} Type={} Bedrooms={} Bathrooms={} \
                 Garage={}'.format(
@@ -156,18 +163,50 @@ def searchpage():
                 form.num_bedroom.data, form.num_bathroom.data, form.num_garage.data))
             flash('errors={}'.format(form.errors.items()))
 
-    return render_template('show.html', form=form)
+    return render_template('search.html', form=form)
 
 # search property / return results
 @app.route('/property')
 def resultpage():
     args = parser.parse_args()
-    return "Address " + args['address'] + "<br/>" \
-    "Landsize " + args['landsize'] + "<br/>" \
-    "Council " + args['council'] + "<br/>" \
-    "Bedrooms " + args['bedrooms'] + "<br/>" \
-    "Bathrooms " + args['bathrooms'] + "<br/>" \
-    "Garage " + args['garage'] + "<br/>" \
+
+    address = args['address']
+    landsize = float(args['landsize'])
+    distance = float(args['distance'])
+
+    council = args['council']  
+    council = re.sub(r"Shire", "Shire Council", council)
+    council = re.sub(r"City", "City Council", council)
+
+    if args['bedrooms']:
+        bedrooms = int(args['bedrooms']) 
+    else:
+        bedrooms = None
+
+    if args['bathrooms']:
+        bathrooms = int(args['bathrooms'])
+    else:
+        bathrooms = None
+
+    if args['garage']:
+        garage = int(args['garage'])
+    else :
+        garage = None
+
+    property_type = args['type']
+    
+    
+    # method, seller and sold year will be none.
+
+    env = [bedrooms,property_type,None,None,None,distance, bathrooms, garage, landsize, council]
+    #ppp.setArgs(env)
+    #price = ppp.predict()
+
+    pic1 = os.path.join("images","avg.png")
+    pic2 = os.path.join("images","greg.png")
+
+    #return render_template('show.html', pic1=pic1, pic2=pic2)
+    return os.path.abspath(pic1)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=80)
+    app.run(debug=True, host='0.0.0.0', port=12345)

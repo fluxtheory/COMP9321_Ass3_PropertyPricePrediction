@@ -24,41 +24,6 @@
         </div>
     </nav>
 
-  <nav class="navbar navbar-second">
-      <form class="navbar-form navbar-header" method="POST" action="">    
-        {{ form.hidden_tag() }}
-        <div class="form-row">
-          <div class="col-md-12 mb-auto">
-
-            {{ form.address(class="form-control", placeholder="Address") }}
-
-            {{ form.landsize(class="form-control", placeholder="Landsize (m²)") }}
-
-            {{ form.council.label(class="form-control") }}
-            {{ form.council(class="form-control", placeholder="Council") }}
-
-            {{ form.property_type.label(class="form-control") }}
-            {{ form.property_type(class="form-control") }}
-        
-
-            {{ form.num_bedroom.label(class="form-control") }}
-            {{ form.num_bedroom(class="form-control") }}
-
-    
-            {{ form.num_bathroom.label(class="form-control") }}
-            {{ form.num_bathroom(class="form-control") }}
-        
-
-            {{ form.num_garage.label(class="form-control") }}
-            {{ form.num_garage(class="form-control") }}
-                
-            {{ form.submit(class="btn btn-outline-info") }}
-          
-          </div>
-        </div>
-      </form>
-  </nav>   
-    
 {% endblock %}
 
 {% block content %}
@@ -73,17 +38,9 @@
         {% endif %}
       {% endwith %}
 
-    {% if form.errors %}
-        <ul class="errors">
-            {% for field_name, field_errors in form.errors|dictsort if field_errors %}
-                {% for error in field_errors %}
-                    <li>{{ form[field_name].label }}: {{ error }}</li>
-                {% endfor %}
-            {% endfor %}
-        </ul>
-    {% endif %}
+      <img src="{{ pic1 }}" alt="User Image">
+      <img src="{{ pic2 }}" alt="User Image">
     </div>
-
 
 {% endblock %}
 
