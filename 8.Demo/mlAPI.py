@@ -58,23 +58,35 @@ class PropertyPricePrediction():
     def predict(self):
         train = self.train
         # get input data
-        self.regionName = train.Regionname[train.CouncilArea == self.councilArea][0]
-        self.propertyCount = train.Propertycount[train.CouncilArea == self.councilArea][0]
+        # print('self.councilArea',self.councilArea)
+        R_n = train.Regionname[train.CouncilArea == self.councilArea]
+        # print(R_n.iat[0])
+        # print(type(train.Regionname[train.CouncilArea == self.councilArea]))
+        self.regionName = R_n.iat[0]
+        cnt = train.Propertycount[train.CouncilArea == self.councilArea]
+        self.propertyCount = cnt.iat[0]
         self.column = ['Rooms','Type','Method','SellerG','Sold_Year','Distance','Bathroom','Car','Landsize','CouncilArea','Regionname','Propertycount']
         self.inputData = [self.room,self.type,self.method,self.sellerG,self.soldYear,self.distance,self.bathroom,self.car,self.landSize,self.councilArea,self.regionName,self.propertyCount]
+        # print('Input data ', self.inputData)
         self.input = pd.DataFrame(data=[self.inputData],columns=self.column)
         # print('Property information:')
         # print(self.input)
         self.dummy_test = self.dummy_data(self.input,train)
 
         self.dummy_test = self.dummy_test.drop(['Unnamed: 0'], axis=1)
+
         # print('-----------')
         # print(self.dummy_test)
+        # print('-----------')
         # transfer the input to xgb data structure
         dtest = xgb.DMatrix(data=self.dummy_test)
 
         # save some regarding charts
-        os.chdir('./images')
+        if os.path.exists('images'):
+            os.chdir('./images')
+        else:
+            os.mkdir('images')
+            os.chdir('./images')
         # chart 1:
         name = f'Average Price Of {self.env[1]} In Different Regions'
         if not os.path.exists(name + '.png'):
@@ -182,6 +194,7 @@ class PropertyPricePrediction():
 
         train2['Date'] = train2['Date'].apply(lambda x: re.search(r'(\d{4})', str(x)).group())
         train2.rename(columns={'Date': 'Sold_Year'}, inplace=True)
+        train2['SellerG'] = train2['SellerG'].apply(lambda x: str(x).title())
         train2.to_csv('train.csv')
         # return train2
 
@@ -212,10 +225,14 @@ class PropertyPricePrediction():
 
     def dummy_data(self,df,train):
         train1 = train.drop(['Price'], axis=1)
-        column_name = train1.columns.values.tolist()
-        # value = [[0] * len(column_name)]
-        newDF = pd.DataFrame(data=[[0] * len(column_name)], columns=column_name)
+        X = pd.get_dummies(train1).reset_index(drop=True)
+        column_name = X.columns.values.tolist()
+        value = [[0] * len(column_name)]
+        newDF = pd.DataFrame(data=value, columns=column_name)
         # get column_name list of input dataFrame
+        # print('__________________newDF -_____________')
+        # print(newDF)
+        # print('__________________newDF -_____________')
         clist = df.columns.values.tolist()
         for i in range(len(clist)):
             if type(df[clist[i]][0]) != str:
@@ -226,6 +243,9 @@ class PropertyPricePrediction():
                 # print('c:', column)
                 if column in column_name:
                     newDF[column] = 1
+        # print('__________________newDF -_____________')
+        # print(newDF)
+        # print('__________________newDF -_____________')
         return newDF
 
 if __name__ == '__main__':
@@ -243,8 +263,9 @@ if __name__ == '__main__':
     # CouncilArea      string
 
     ppp = PropertyPricePrediction()
-    env = [3,'House','S','Greg','None',2.5,2.0,0.0,134.0,'Yarra City Council']
+    env = [3,'h','None','None','2018',2.5,2.0,0.0,134.0,'Yarra City Council']
     ppp.setArgs(env)
     print("Start to predict")
     price = ppp.predict()
-    print('The price of this property is: AUD$',price[0])
+    print('The price of this property is: AUD$',round(price[0],2))
+    # Yarra City Council ,  Port Phillip City Council
