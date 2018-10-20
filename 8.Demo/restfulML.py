@@ -1,7 +1,7 @@
 #-*-coding:utf8-*-
 __author__ = 'Pengcheng Xie, Xavier Yan'
 
-#from mlAPI import PropertyPricePrediction
+from mlAPI import PropertyPricePrediction
 
 from flask import Flask, request
 from flask_restplus import fields, inputs, reqparse, Resource, Api
@@ -45,24 +45,24 @@ class HousePrediction(Resource):
     @api.expect(request_model, validate=True)
     def post(self):
 
-        self.Rooms = request.json['bedrooms']
-        self.Type = request.json['property_type']
-        self.Distance = request.json['distance']
-        self.Bathrooms = request.json['bathrooms']
-        self.Car = request.json['garage']
-        self.LandSize = request.json['landsize']
-        self.CouncilArea = request.json['council']
+        Rooms = request.json['bedrooms']
+        Type = request.json['property_type']
+        Distance = request.json['distance']
+        Bathrooms = request.json['bathrooms']
+        Car = request.json['garage']
+        LandSize = request.json['landsize']
+        CouncilArea = request.json['council']
 
-        env = [self.Rooms, self.Type,'S','Nelson','2018', self.Distance,float(self.Bathrooms),float(self.Car),self.LandSize,self.CouncilArea]
+        env = [Rooms, Type,'S','Nelson','2018', Distance,float(Bathrooms),float(Car),LandSize,CouncilArea]
 
         return {
-            "bedrooms" : str(self.Rooms),
-            "bathroom" : str(self.Bathrooms),
-            "garage"   : str(self.Car),
-            "type"     : str(self.Type),
-            "landsize" : str(self.LandSize),
-            "distance" : str(self.Distance),
-            "council"  : self.CouncilArea
+            "bedrooms" : str(Rooms),
+            "bathrooms" : str(Bathrooms),
+            "garage"   : str(Car),
+            "property_type"     : str(Type),
+            "landsize" : str(LandSize),
+            "distance" : str(Distance),
+            "council"  : CouncilArea
         }, 200
         
         # if not check:

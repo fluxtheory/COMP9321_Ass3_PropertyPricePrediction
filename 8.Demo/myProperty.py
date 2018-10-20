@@ -195,22 +195,26 @@ def resultpage():
 
     property_type = args['type']
 
-    data = {
-
-    }
-    '''
-    # this isnt a json request!
-    r = requests.get('http://localhost:5000/predictionService' + str(bedrooms) + '/' + property_type + '/' + str(distance) + '/' + str(bathrooms) + '/' + str(garage) + '/' +str(landsize) +'/'+council)
-    print('Status Code:' + str(r.status_code))
+    r = requests.post('http://localhost:5000/predictionService', json={
+        "bedrooms" : bedrooms,
+        "bathrooms" : bathrooms,
+        "garage"   : garage,
+        "council"  : council,
+        "property_type" : property_type,
+        "distance" : distance,
+        "landsize" : landsize    
+    }) 
+    
     resp = r.json()
-    #print(resp['bedrooms'])
+    
 
     pic1 = os.path.join("images","avg.png")
     pic2 = os.path.join("images","greg.png")
-    '''
-    return render_template('show.html')
+    
+    #return render_template('show.html')
     #return os.path.abspath(pic1)
-    #return resp['bedrooms']+"<br>"+resp['type']+"<br>"+resp['distance']
+    return resp['bedrooms']+"<br>"+resp['bathrooms']+"<br>"+resp['garage'] \
+    + "<br>"+resp['council'] + "<br>"+resp['property_type'] + "<br>"+resp['distance'] + "<br>"+resp['landsize']
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=12345)
