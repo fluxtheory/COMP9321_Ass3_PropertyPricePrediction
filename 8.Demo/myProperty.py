@@ -20,7 +20,7 @@ bootstrap = Bootstrap(app)
 #ppp = PropertyPricePrediction()
 
 parser = reqparse.RequestParser()
-parser.add_argument('address',required=True)
+#parser.add_argument('address',required=True)
 parser.add_argument('landsize', required=True)
 parser.add_argument('distance', required=True)
 parser.add_argument('council')
@@ -116,7 +116,7 @@ melb_councils = [("Alpine Shire","Alpine Shire"),
 ("Yarriambiack Shire","Yarriambiack Shire")]
 
 class SearchForm(FlaskForm):
-    address = StringField('Address', validators=[DataRequired()])
+    #address = StringField('Address', validators=[DataRequired()])
     distance = IntegerField('Distance to CBD', validators=[DataRequired()])
     council = SelectField('Council', validators=[Optional()], choices=melb_councils, default="")
     landsize = IntegerField('Landsize', validators=[InputRequired(), NumberRange(min=1, max=9999, message="Please provide a valid number")])
@@ -149,17 +149,17 @@ def searchpage():
     form = SearchForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            flash('Retrieving prediction for address={} Council={} Landsize={} Type={} Bedrooms={} Bathrooms={} \
+            flash('Retrieving prediction for Council={} Landsize={} Type={} Bedrooms={} Bathrooms={} \
                 Garage={}'.format(
-                form.address.data, form.council.data, form.landsize.data, form.property_type.data, \
-                form.num_bedroom.data, form.num_bathroom.data, form.num_garage.data))
+                form.council.data, form.landsize.data, form.property_type.data, \
+                form.num_bedroom.data, form.num_bathroom.data, form.num_garage.data)) # form.address.data
             session.clear()
-            return redirect(url_for('resultpage', address=form.address.data, landsize=form.landsize.data, council=form.council.data, \
-            type=form.property_type.data, bedrooms=form.num_bedroom.data, bathrooms=form.num_bathroom.data, garage=form.num_garage.data, distance=form.distance.data))
+            return redirect(url_for('resultpage', landsize=form.landsize.data, council=form.council.data, \
+            type=form.property_type.data, bedrooms=form.num_bedroom.data, bathrooms=form.num_bathroom.data, garage=form.num_garage.data, distance=form.distance.data))   #address=form.address.data,
         else:
-            flash('Retrieving prediction for address={} Council={} Landsize={} Type={} Bedrooms={} Bathrooms={} \
+            flash('Retrieving prediction for Council={} Landsize={} Type={} Bedrooms={} Bathrooms={} \
                 Garage={}'.format(
-                form.address.data, form.council.data, form.landsize.data, form.property_type.data, \
+                form.council.data, form.landsize.data, form.property_type.data, \
                 form.num_bedroom.data, form.num_bathroom.data, form.num_garage.data))
             flash('errors={}'.format(form.errors.items()))
 
@@ -170,7 +170,7 @@ def searchpage():
 def resultpage():
     args = parser.parse_args()
 
-    address = args['address']
+    #address = args['address']
     landsize = float(args['landsize'])
     distance = float(args['distance'])
 
@@ -205,8 +205,8 @@ def resultpage():
     pic1 = os.path.join("images","avg.png")
     pic2 = os.path.join("images","greg.png")
 
-    #return render_template('show.html', pic1=pic1, pic2=pic2)
-    return os.path.abspath(pic1)
+    return render_template('show.html', pic1=pic1, pic2=pic2)
+    #return os.path.abspath(pic1)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=12345)

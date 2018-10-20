@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block navbar %}
-    <nav class="navbar navbar-default">
+    <nav class="navbar navbar-inverse">
 
         <div class="container">
             <div class="navbar-header">
@@ -17,19 +17,55 @@
                     <li><a href="{{ url_for('searchpage') }}">Search</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">    
-                    <li><a href="{{ url_for('login') }}">Profile</a></li>
                     <li><a href="{{ url_for('login') }}">Logout</a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
-  <nav class="navbar navbar-second">
+  <nav class="navbar navbar-second bg-steel">
+
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9LRe04ezbuuR5SEYFMp60huOy0i8zWxk&libraries=places"></script>
+
       <form class="navbar-form navbar-header" method="POST" action="">    
         <div class="form-row">
           <div class="col-md-12 mb-auto">
             {{ form.hidden_tag() }}
-            {{ form.address(class="form-control", placeholder="Address") }}
+
+            <input type="text" id="searchplace" placeholder="Address" size=50 />
+            <input type="hidden" id="latitude" name="latitude"/>
+            <input type="hidden" id="longitude" name="longitude"/>
+
+            <script type="text/javascript">
+                function initialize() {
+                    var searchBox = document.getElementById('searchplace');
+                    var autocomplete =  new google.maps.places.Autocomplete(searchBox);
+                    var latitude;
+                    var longitude;
+
+                    google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                        var place = autocomplete.getPlace();
+
+                        latitude = place.geometry.location.lat();
+                        longitude = place.geometry.location.lng();
+                        document.getElementById('latitude').value = place.geometry.location.lat();
+                        document.getElementById('longitude').value = place.geometry.location.lng();   
+
+
+                    }); 
+                    var location = new google.maps.LatLng(50.0875726, 14.4189987);
+                    var mapCanvas = document.getElementById('map');
+                    var mapOptions = { 
+                        center: location,
+                        panControl: false,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                    }
+                    var map = new google.maps.Map(mapCanvas, mapOptions);                                            
+                }
+                google.maps.event.addDomListener(window, 'load', initialize);
+            </script>
+        
+            
 
             {{ form.landsize(class="form-control", placeholder="Landsize (m²)") }}
 
@@ -63,6 +99,9 @@
 {% endblock %}
 
 {% block content %}
+
+    <div id="map" data-role="page"></div>
+
     <div class="container">
       {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -85,6 +124,7 @@
     {% endif %}
     </div>
 
+    
 
 {% endblock %}
 
