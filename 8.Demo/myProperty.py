@@ -120,7 +120,7 @@ class SearchForm(FlaskForm):
     distance = IntegerField('Distance to CBD', validators=[DataRequired()])
     council = SelectField('Council', validators=[Optional()], choices=melb_councils, default="")
     landsize = IntegerField('Landsize', validators=[InputRequired(), NumberRange(min=1, max=9999, message="Please provide a valid number")])
-    property_type = SelectField('Type', validators=[DataRequired()], choices=[('House','House'), ('Unit','Unit'), ('Other','Other')])
+    property_type = SelectField('Type', validators=[DataRequired()], choices=[('House','House'), ('Unit','Unit'), ('Townhouse','Townhouse')])
     num_bedroom = SelectField('Bedrooms', validators=[Optional()], choices=[("",""),('1','1'),('2','2'),('3','3'),('4','4')], default="")
     num_bathroom = SelectField('Bathrooms', validators=[Optional()], choices=[("",""),('1','1'),('2','2'),('3','3')], default="")
     num_garage = SelectField('Garage Spaces', validators=[Optional()], choices=[("",""),('0','0'),('1','1'),('2','2')], default="")
@@ -140,7 +140,7 @@ def login():
                 return redirect(url_for('searchpage', name=form.username.data))
             else :
                 flash('Incorrect username or password')
- 
+
     return render_template('login.html', form=form)
 
 
@@ -174,12 +174,12 @@ def resultpage():
     landsize = float(args['landsize'])
     distance = float(args['distance'])
 
-    council = args['council']  
+    council = args['council']
     council = re.sub(r"Shire", "Shire Council", council)
     council = re.sub(r"City", "City Council", council)
 
     if args['bedrooms']:
-        bedrooms = int(args['bedrooms']) 
+        bedrooms = int(args['bedrooms'])
     else:
         bedrooms = None
 
@@ -194,19 +194,23 @@ def resultpage():
         garage = None
 
     property_type = args['type']
-    
-    
-    # method, seller and sold year will be none.
 
-    env = [bedrooms,property_type,None,None,None,distance, bathrooms, garage, landsize, council]
-    #ppp.setArgs(env)
-    #price = ppp.predict()
+    data = {
+
+    }
+    '''
+    # this isnt a json request!
+    r = requests.get('http://localhost:5000/predictionService' + str(bedrooms) + '/' + property_type + '/' + str(distance) + '/' + str(bathrooms) + '/' + str(garage) + '/' +str(landsize) +'/'+council)
+    print('Status Code:' + str(r.status_code))
+    resp = r.json()
+    #print(resp['bedrooms'])
 
     pic1 = os.path.join("images","avg.png")
     pic2 = os.path.join("images","greg.png")
-
-    return render_template('show.html', pic1=pic1, pic2=pic2)
+    '''
+    return render_template('show.html')
     #return os.path.abspath(pic1)
+    #return resp['bedrooms']+"<br>"+resp['type']+"<br>"+resp['distance']
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=12345)
