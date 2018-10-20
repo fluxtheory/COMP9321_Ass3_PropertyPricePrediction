@@ -1,14 +1,10 @@
 #-*-coding:utf8-*-
-__author__ = 'Pengcheng Xie'
+__author__ = 'Pengcheng Xie, Xavier Yan'
 
-from mlAPI import PropertyPricePrediction
+#from mlAPI import PropertyPricePrediction
 
-from flask_restplus import Resource, Api
-from flask import request
-from flask import Flask
-from flask_restplus import fields
-from flask_restplus import inputs
-from flask_restplus import reqparse
+from flask import Flask, request
+from flask_restplus import fields, inputs, reqparse, Resource, Api
 
 app = Flask(__name__)
 api = Api(app,
@@ -16,20 +12,65 @@ api = Api(app,
           title="Property Features",  # Documentation Title
           description="This is the assignment 3 for Property Price Prediction.")  # Documentation Description
 
-@api.route('/pengcheng9321/<int:Rooms>/<string:Type>/<float:Distance>/<int:Bathrooms>/<int:Car>/<float:LandSize>/<string:CouncilArea>')
-@api.param('Rooms', 'Number of rooms.')
-@api.param('Type', 'br - bedroom(s); h - house,cottage,villa, semi,terrace; u - unit, duplex; t - townhouse; dev site - development site; o res - other residential.')
-@api.param('Distance', 'Distance from CBD in Kilometres.')
-@api.param('Bathrooms', 'Number of bathrooms.')
-@api.param('Car', 'Number of car spots.')
-@api.param('LandSize', 'Land Size in Metres squared.')
-@api.param('CouncilArea', 'Governing council for the area.')
+# if we're going by url  i.e. http://localhost:12345/bedrooms=3&bathrooms=1&garage=0& .... etc
+parser = reqparse.RequestParser()
+parser.add_argument('bedrooms')
+parser.add_argument('bathrooms')
+parser.add_argument('garage')
+parser.add_argument('council', required=True)
+parser.add_argument('property_type', required=True)
+parser.add_argument('distance', required=True)
+parser.add_argument('landsize', required=True)
+
+# otherwise, if we're accepting a json load.
+request_model = api.model('Prediction',
+    { "bedrooms" : fields.Integer,
+      "bathrooms": fields.Integer,
+      "garage"   : fields.Integer,
+      "council"  : fields.String,
+      "property_type": fields.String,
+      "distance" : fields.Float,
+      "landsize" : fields.Float
+    })
+
+
+@api.route('/predictionService')
 class HousePrediction(Resource):
+
+    env = []
+
     @api.response(400, 'Data invalid')
     @api.response(200, 'OK')
-    @api.doc(description="Input some features of your property and you will get its price.")
-    def get(self, Rooms, Type, Distance, Bathrooms, Car, LandSize, CouncilArea):
-        env = [Rooms,Type,'S','Nelson','2018', Distance,float(Bathrooms),float(Car),LandSize,CouncilArea]
+    @api.doc(description="Input some features of your property.")
+    @api.expect(request_model, validate=True)
+    def post(self):
+
+        self.Rooms = request.json['bedrooms']
+        self.Type = request.json['property_type']
+        self.Distance = request.json['distance']
+        self.Bathrooms = request.json['bathrooms']
+        self.Car = request.json['garage']
+        self.LandSize = request.json['landsize']
+        self.CouncilArea = request.json['council']
+
+        env = [self.Rooms, self.Type,'S','Nelson','2018', self.Distance,float(self.Bathrooms),float(self.Car),self.LandSize,self.CouncilArea]
+
+        return {
+            "bedrooms" : str(self.Rooms),
+            "bathroom" : str(self.Bathrooms),
+            "garage"   : str(self.Car),
+            "type"     : str(self.Type),
+            "landsize" : str(self.LandSize),
+            "distance" : str(self.Distance),
+            "council"  : self.CouncilArea
+        }, 200
+        
+        # if not check:
+        #     api.abort(400, "Input information invalid")
+
+    @api.doc(description="Retrieves the price information")
+    def get(self):
+        
         predict_price = PropertyPricePrediction()
         predict_price.setArgs(env)
         price, pic_name, info = predict_price.predict()
@@ -38,10 +79,9 @@ class HousePrediction(Resource):
         response['pic_name'] = pic_name
         response['similar_property'] = info
         return response, 200
+            
 
-        # if not check:
-        #     api.abort(400, "Input information invalid")
-
+    #def get(self)
 # @api.route('/pengcheng9321/<int:Rooms>/<string:Type>')
 # @api.param('Rooms', 'Number of rooms.')
 # @api.param('Type', 'br - bedroom(s); h - house,cottage,villa, semi,terrace; u - unit, duplex; t - townhouse; dev site - development site; o res - other residential.')
@@ -58,4 +98,6 @@ class HousePrediction(Resource):
 #         return {"message": "The price is {} ".format(Type)}, 200
 
 # run the application
-app.run(debug=True)
+
+if __name__ == '__main__':
+    app.run(debug=True)
