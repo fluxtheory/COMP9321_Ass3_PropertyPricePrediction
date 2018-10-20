@@ -32,9 +32,12 @@ class HousePrediction(Resource):
         env = [Rooms,Type,'S','Nelson','2018', Distance,float(Bathrooms),float(Car),LandSize,CouncilArea]
         predict_price = PropertyPricePrediction()
         predict_price.setArgs(env)
-        price = predict_price.predict()
-        price = round(price[0])
-        return {"message": "The price of this property is: AUD$ {} ".format(price)}, 200
+        price, pic_name, info = predict_price.predict()
+        response = dict()
+        response['price'] = price
+        response['pic_name'] = pic_name
+        response['similar_property'] = info
+        return response, 200
 
         # if not check:
         #     api.abort(400, "Input information invalid")

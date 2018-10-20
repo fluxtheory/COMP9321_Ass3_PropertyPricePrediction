@@ -92,7 +92,9 @@ class PropertyPricePrediction():
 
         dictionary = {'h':'House','u':'Unit','t':'Townhouse','dev site':'Development Site','o res':'Other Residential'}
         # chart 1:
+        pic_name = list()
         name = f'Average Price Of {dictionary[self.env[1]]} In Different Regions'
+        pic_name.append(name)
         if not os.path.exists(name + '.png'):
             CSV1 = train[['Regionname', 'Landsize', 'Price', 'Type']]
             CSV1 = CSV1[CSV1['Type'] == self.type]
@@ -110,6 +112,7 @@ class PropertyPricePrediction():
 
         # chart 2: the average pricein different council area
         name = f'Average Price Of {dictionary[self.type]} In Different Council Area'
+        pic_name.append(name)
         if not os.path.exists(name + '.png'):
             plt.rcdefaults()
             CSV3 = train[['CouncilArea', 'Landsize', 'Price', 'Type']]
@@ -128,6 +131,7 @@ class PropertyPricePrediction():
 
         # chart 3: the average price of council area in different year
         name = f'Average Price Of {dictionary[self.type]} Over Years'
+        pic_name.append(name)
         if not os.path.exists(name + '.png'):
             plt.rcdefaults()
             CSV3 = train[['Sold_Year', 'Landsize', 'Price', 'Type']]
@@ -188,7 +192,7 @@ class PropertyPricePrediction():
             else:
                 row[3] = 'Other'
 
-        return preds, info
+        return preds, pic_name, info
 
     def processing(self):
         trainf = pd.read_csv('FULL.csv')
