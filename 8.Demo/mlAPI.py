@@ -1,6 +1,7 @@
 #-*-coding:utf8-*-
 __author__ = 'Pengcheng Xie & Hanming Yin'
 
+import random
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,6 +32,7 @@ class PropertyPricePrediction():
     # Regionname       string
     # Propertycount    float64
     def __init__(self):
+        self.ds = pd.read_csv('Full.csv')
         if os.path.exists('train.csv'):
             print('Clean data has been found, loading ...')
             self.train = pd.read_csv('train.csv')
@@ -90,7 +92,9 @@ class PropertyPricePrediction():
 
         dictionary = {'h':'House','u':'Unit','t':'Townhouse','dev site':'Development Site','o res':'Other Residential'}
         # chart 1:
+        pic_name = list()
         name = f'Average Price Of {dictionary[self.env[1]]} In Different Regions'
+        pic_name.append(name)
         if not os.path.exists(name + '.png'):
             CSV1 = train[['Regionname', 'Landsize', 'Price', 'Type']]
             CSV1 = CSV1[CSV1['Type'] == self.type]
@@ -108,6 +112,7 @@ class PropertyPricePrediction():
 
         # chart 2: the average pricein different council area
         name = f'Average Price Of {dictionary[self.type]} In Different Council Area'
+        pic_name.append(name)
         if not os.path.exists(name + '.png'):
             plt.rcdefaults()
             CSV3 = train[['CouncilArea', 'Landsize', 'Price', 'Type']]
@@ -126,6 +131,7 @@ class PropertyPricePrediction():
 
         # chart 3: the average price of council area in different year
         name = f'Average Price Of {dictionary[self.type]} Over Years'
+        pic_name.append(name)
         if not os.path.exists(name + '.png'):
             plt.rcdefaults()
             CSV3 = train[['Sold_Year', 'Landsize', 'Price', 'Type']]
@@ -148,19 +154,45 @@ class PropertyPricePrediction():
         if os.path.exists('ppp.model'):
             print('Pre-trained model found, begin to predict price ...')
             bst2 = xgb.Booster(model_file='ppp.model')
-            preds = bst2.predict(dtest)
+            preds = bst2.predict(dtest)[0]
             print('Property information:')
             print(self.input)
-            return preds
         else:
             print('Not found pre-trained model, we are training model now ...')
             # train first then predict.
             self.training(train=train)
             bst2 = xgb.Booster(model_file='ppp.model')
-            preds = bst2.predict(dtest)
+            preds = bst2.predict(dtest)[0]
             print('Property information:')
             print(self.input)
-            return preds
+
+        new = self.ds[['Address', 'Rooms', 'Landsize', 'Type', 'Price']]
+        new1 = new[new['Price'] > (preds - 10000)]
+        new2 = new1[new1['Price'] < (preds + 10000)]
+        newcsv = new2.reset_index(drop = True)
+
+        info = list()
+        length = newcsv.shape[0]
+        if length >= 5:
+            for i in range(5):
+                idx = random.randint(0, length - 1)
+                info.append(list(newcsv.loc[idx]))
+        elif length > 0:
+            for i in range(length):
+                idx = random.randint(0, length - 1)
+                info.append(list(newcsv.loc[idx]))
+
+        for row in info:
+            if row[3] == 'h' or row[3] == 'H':
+                row[3] = 'House'
+            elif row[3] == 'u' or row[3] == 'U':
+                row[3] = 'Unit'
+            elif row[3] == 't' or row[3] == 'T':
+                row[3] = 'TownHouse'
+            else:
+                row[3] = 'Other'
+
+        return preds, pic_name, info
 
     def processing(self):
         trainf = pd.read_csv('FULL.csv')
@@ -268,6 +300,7 @@ if __name__ == '__main__':
     env = [3,'h','None','None','2018',2.5,2.0,0.0,134.0,'Yarra City Council']
     ppp.setArgs(env)
     print("Start to predict")
-    price = ppp.predict()
-    print('The price of this property is: AUD$',round(price[0]))
+    price, similar_property = ppp.predict()
+    print('The price of this property is: AUD$',round(price))
+    print('The property have similar price', similar_property)
     # Yarra City Council ,  Port Phillip City Council
