@@ -22,7 +22,7 @@ api = Api(app,
 @api.param('Distance', 'Distance from CBD in Kilometres.')
 @api.param('Bathrooms', 'Number of bathrooms.')
 @api.param('Car', 'Number of car spots.')
-@api.param('LandSize', 'Land Size in Metres.')
+@api.param('LandSize', 'Land Size in Metres squared.')
 @api.param('CouncilArea', 'Governing council for the area.')
 class HousePrediction(Resource):
     @api.response(400, 'Data invalid')
