@@ -232,14 +232,16 @@ def sign_up():
         if form.validate_on_submit():
             if(form.password.data == form.ConfirmPassword.data):
 
-                userdb.insert(User=form.username.data, Password=form.password.data)
-                flash('You have registered successfully!')
+                resp = userdb.insert(User=form.username.data, Password=form.password.data)
+
+                if(resp):
+                    flash('You have registered successfully!')
+                else :
+                    flash('This username has been taken')
                 return redirect(url_for('login'))
             else :
                 flash('Passwords do not match')
 
-            #if(check for duplicate usernames):
-            #    flash('This username has been taken')
         else :
             flash('Username is invalid')
 
