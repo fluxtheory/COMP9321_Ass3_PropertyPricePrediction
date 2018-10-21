@@ -12,9 +12,15 @@ class UserDB():
                USERNAME           TEXT    NOT NULL,
                PASSWORD           TEXT     NOT NULL);''')
         print("Table created successfully")
+
+        res = c.execute("SELECT COUNT(*) FROM UserInfo")
+        info = list()
+        for row in res:
+            info.append(row)
+        self.ID = info[0][0]
+        print(self.ID)
         conn.commit()
         conn.close()
-        self.ID = 0
 
     def insert(self, User, Password):
         conn = sqlite3.connect('user.sqlite')
@@ -67,6 +73,8 @@ class UserDB():
 
 if __name__ == '__main__':
     userdb = UserDB()
+    userdb.insert('Xavier', '12345678')
+    userdb.insert('Eric', '12345678')
     userdb.check('Patrick', '12345678')
     userdb.insert('Patrick', '12345678')
     userdb.check('Patrick', '12345678')
