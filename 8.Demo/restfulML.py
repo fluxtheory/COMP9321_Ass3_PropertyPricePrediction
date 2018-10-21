@@ -1,7 +1,7 @@
 #-*-coding:utf8-*-
 __author__ = 'Pengcheng Xie, Xavier Yan'
 
-from mlAPI import PropertyPricePrediction
+#from mlAPI import PropertyPricePrediction
 
 from flask import Flask, request
 from flask_restplus import fields, inputs, reqparse, Resource, Api
@@ -42,7 +42,7 @@ class HousePrediction(Resource):
     @api.response(400, 'Data invalid')
     @api.response(200, 'OK')
     @api.doc(description="Input some features of your property.")
-    @api.expect(request_model, validate=True)
+    @api.expect(request_model)
     def post(self):
 
         Rooms = request.json['bedrooms']
@@ -53,7 +53,7 @@ class HousePrediction(Resource):
         LandSize = request.json['landsize']
         CouncilArea = request.json['council']
 
-        env = [Rooms, Type,'S','Nelson','2018', Distance,float(Bathrooms),float(Car),LandSize,CouncilArea]
+        self.env = [Rooms, Type,'S','Nelson','2018', Distance,float(Bathrooms),float(Car),LandSize,CouncilArea]
 
         return {
             "bedrooms" : str(Rooms),

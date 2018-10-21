@@ -90,6 +90,7 @@
             {{ form.num_garage(class="form-control") }}
                 
             {{ form.submit(class="btn btn-outline-info") }}
+
           
           </div>
         </div>
@@ -99,8 +100,9 @@
 {% endblock %}
 
 {% block content %}
-
-    <div id="map" data-role="page"></div>
+    <link href='custom.css' rel='stylesheet' type='text/css'>
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <div id="map"></div>
 
     <div class="container">
       {% with messages = get_flashed_messages() %}
