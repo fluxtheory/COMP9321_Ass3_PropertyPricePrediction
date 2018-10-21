@@ -28,6 +28,14 @@ parser.add_argument('type', required=True)
 parser.add_argument('bedrooms')
 parser.add_argument('bathrooms')
 parser.add_argument('garage')
+parser.add_argument('json')
+
+
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max =50)])
+    password = PasswordField('Password', validators=[DataRequired()])
+    ConfirmPassword = PasswordField('Confirm Password', validators=[DataRequired()])
+    submit = SubmitField('Register')
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max =50)])
@@ -140,7 +148,7 @@ def login():
                 return redirect(url_for('searchpage', name=form.username.data))
             else :
                 flash('Incorrect username or password')
-
+ 
     return render_template('login.html', form=form)
 
 
@@ -149,68 +157,86 @@ def searchpage():
     form = SearchForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            flash('Retrieving prediction for Council={} Landsize={} Type={} Bedrooms={} Bathrooms={} \
+            flash('Retrieving prediction for Council={} Distance={} Landsize={} Type={} Bedrooms={} Bathrooms={} \
                 Garage={}'.format(
-                form.council.data, form.landsize.data, form.property_type.data, \
+                form.council.data, form.distance.data, form.landsize.data, form.property_type.data, \
                 form.num_bedroom.data, form.num_bathroom.data, form.num_garage.data)) # form.address.data
+
+            if(form.num_bedroom.data == ""):
+                form.num_bedroom.data = 0
+
+            if(form.num_bathroom.data == ""):
+                form.num_bathroom.data = 0
+
+            if(form.num_garage.data == ""):
+                form.num_garage.data = 0
+
+            r = requests.post('http://localhost:5000/predictionService', json={
+                "bedrooms" : form.num_bedroom.data,
+                "bathrooms": form.num_bathroom.data,
+                "garage"   : form.num_garage.data,
+                "council"  : form.council.data,
+                "property_type" : form.property_type.data,
+                "distance" : float(form.distance.data),
+                "landsize" : float(form.landsize.data)    
+            }) 
+            if r.ok:
+                resp = r.json()
+            else:
+                flash('Invalid data was submitted, or the prediction service is currently unavailable')
+                return render_template('search.html', form=form)
+
             session.clear()
-            return redirect(url_for('resultpage', landsize=form.landsize.data, council=form.council.data, \
-            type=form.property_type.data, bedrooms=form.num_bedroom.data, bathrooms=form.num_bathroom.data, garage=form.num_garage.data, distance=form.distance.data))   #address=form.address.data,
+            return redirect(url_for('resultpage', json=resp)) 
+            #return redirect(url_for('resultpage', landsize=form.landsize.data, council=form.council.data, \
+            #type=form.property_type.data, bedrooms=form.num_bedroom.data, bathrooms=form.num_bathroom.data, garage=form.num_garage.data, distance=form.distance.data))   #address=form.address.data,
         else:
             flash('Retrieving prediction for Council={} Landsize={} Type={} Bedrooms={} Bathrooms={} \
                 Garage={}'.format(
                 form.council.data, form.landsize.data, form.property_type.data, \
                 form.num_bedroom.data, form.num_bathroom.data, form.num_garage.data))
             flash('errors={}'.format(form.errors.items()))
-
+    
     return render_template('search.html', form=form)
 
 # search property / return results
 @app.route('/property')
 def resultpage():
-    args = parser.parse_args()
 
-    #address = args['address']
-    landsize = float(args['landsize'])
-    distance = float(args['distance'])
+    r = requests.get('http://localhost:5000/predictionService')
+    json = r.json()
 
-    council = args['council']
-    council = re.sub(r"Shire", "Shire Council", council)
-    council = re.sub(r"City", "City Council", council)
+    price = json['price']
+    pic_name = json['pic_name']
+    similar_properties = json['similar_property']
 
-    if args['bedrooms']:
-        bedrooms = int(args['bedrooms'])
-    else:
-        bedrooms = None
+    #price = "$500,000"
+    #pic1 = "Average Price Of House In Different Council Area.png"
+    #similar = ['test1','test2'] # list
 
-    if args['bathrooms']:
-        bathrooms = int(args['bathrooms'])
-    else:
-        bathrooms = None
+    return render_template('show.html', price=price, img=pic_name, list=similar_properties)
 
-    if args['garage']:
-        garage = int(args['garage'])
-    else :
-        garage = None
 
-    property_type = args['type']
+@app.route('/register', methods=['GET','POST'])
+def sign_up():
+    form = RegisterForm()
 
-    data = {
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            if(form.password.data == form.ConfirmPassword.data):
+                return redirect(url_for('register_success'))
+            else :
+                flash('Passwords do not match')
+        else :
+            flash('Username is invalid')
 
-    }
-    '''
-    # this isnt a json request!
-    r = requests.get('http://localhost:5000/predictionService' + str(bedrooms) + '/' + property_type + '/' + str(distance) + '/' + str(bathrooms) + '/' + str(garage) + '/' +str(landsize) +'/'+council)
-    print('Status Code:' + str(r.status_code))
-    resp = r.json()
-    #print(resp['bedrooms'])
+    return render_template('register.html', form=form)
 
-    pic1 = os.path.join("images","avg.png")
-    pic2 = os.path.join("images","greg.png")
-    '''
-    return render_template('show.html')
-    #return os.path.abspath(pic1)
-    #return resp['bedrooms']+"<br>"+resp['type']+"<br>"+resp['distance']
-
+@app.route('/success', methods=['GET', 'POST'])
+def register_success():
+    form = RegisterForm()
+    flash('You have successfully registered!')
+    return render_template('register.html', form=form)
+    
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=12345)

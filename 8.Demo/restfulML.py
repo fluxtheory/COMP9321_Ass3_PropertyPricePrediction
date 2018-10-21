@@ -1,5 +1,5 @@
 #-*-coding:utf8-*-
-__author__ = 'Pengcheng Xie, Xavier Yan, Hanming Yin'
+__author__ = 'Pengcheng Xie, Xavier Yan'
 
 #from mlAPI import PropertyPricePrediction
 
@@ -36,46 +36,68 @@ request_model = api.model('Prediction',
 
 @api.route('/predictionService')
 class HousePrediction(Resource):
-    self.env = []
+
+    env = []
+
     @api.response(400, 'Data invalid')
     @api.response(200, 'OK')
     @api.doc(description="Input some features of your property.")
-    @api.expect(request_model, validate=True)
+    @api.expect(request_model)
     def post(self):
-        self.Rooms = request.json['bedrooms']
-        self.Type = request.json['property_type']
-        self.Distance = request.json['distance']
-        self.Bathrooms = request.json['bathrooms']
-        self.Car = request.json['garage']
-        self.LandSize = request.json['landsize']
-        self.CouncilArea = request.json['council']
 
-        self.env = [self.Rooms, self.Type,'S','Nelson','2018', self.Distance,float(self.Bathrooms),float(self.Car),self.LandSize,self.CouncilArea]
+        Rooms = request.json['bedrooms']
+        Type = request.json['property_type']
+        Distance = request.json['distance']
+        Bathrooms = request.json['bathrooms']
+        Car = request.json['garage']
+        LandSize = request.json['landsize']
+        CouncilArea = request.json['council']
+
+        self.env = [Rooms, Type,'S','Nelson','2018', Distance,float(Bathrooms),float(Car),LandSize,CouncilArea]
 
         return {
-            "bedrooms" : str(self.Rooms),
-            "bathroom" : str(self.Bathrooms),
-            "garage"   : str(self.Car),
-            "type"     : str(self.Type),
-            "landsize" : str(self.LandSize),
-            "distance" : str(self.Distance),
-            "council"  : self.CouncilArea
+            "bedrooms" : str(Rooms),
+            "bathrooms" : str(Bathrooms),
+            "garage"   : str(Car),
+            "property_type"     : str(Type),
+            "landsize" : str(LandSize),
+            "distance" : str(Distance),
+            "council"  : CouncilArea
         }, 200
+        
+        # if not check:
+        #     api.abort(400, "Input information invalid")
 
     @api.doc(description="Retrieves the price information")
     def get(self):
+        
         predict_price = PropertyPricePrediction()
-        predict_price.setArgs(self.env)
+        predict_price.setArgs(env)
         price, pic_name, info = predict_price.predict()
         response = dict()
-        response["price"] = int(price)
+        response['price'] = price
         response['pic_name'] = pic_name
-        for i in range(len(info)):
-            for j in range(len(info[i])):
-                info[i][j] = str(info[i][j])
-            response["property" + str(i + 1)] = info[i]
-        response = json.dumps(response)
+        response['similar_property'] = info
         return response, 200
+            
+
+    #def get(self)
+# @api.route('/pengcheng9321/<int:Rooms>/<string:Type>')
+# @api.param('Rooms', 'Number of rooms.')
+# @api.param('Type', 'br - bedroom(s); h - house,cottage,villa, semi,terrace; u - unit, duplex; t - townhouse; dev site - development site; o res - other residential.')
+# # @api.param('Distance', 'Distance from CBD in Kilometres.')
+# class HousePrediction(Resource):
+#     @api.response(400, 'Data invalid')
+#     @api.response(200, 'OK')
+#     # @api.doc(description="Q5: Get an economic indicator value for given country and a year")
+#     def get(self, Rooms, Type):
+#         # env = [Rooms,Type,'None','None','None', Distance,Bathrooms,Car,LandSize,CouncilArea]
+#         predict_price = PropertyPricePrediction()
+#         # predict_price.setArgs(env)
+#         # price = predict_price.predict()
+#         return {"message": "The price is {} ".format(Type)}, 200
+
+# run the application
 
 if __name__ == '__main__':
-    app.run(debug = True)
+    app.run(debug=True)

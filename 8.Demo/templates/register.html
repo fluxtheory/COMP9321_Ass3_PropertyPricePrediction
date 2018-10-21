@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+  <form method="POST" action="">
+      {{ form.hidden_tag() }}
+      <fieldset class="form-group">
+        <legend class="border-bottom mb-4">Register</legend>
+        <div class="form-group">
+
+         {{form.username.label(class="form-control")}}
+         {{form.username(class="form-control")}}
+          
+         {{form.password.label(class="form-control")}}
+         {{form.password(class="form-control")}}
+
+
+         {{form.ConfirmPassword.label(class="form-control")}}
+         {{form.ConfirmPassword(class="form-control")}}
+
+        </div>
+      </fieldset>
+
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class=flashes>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    
+      <div class="form-group">
+        {{ form.submit(class="btn btn-outline-info") }}
+      </div>
+  </form>
+</div>
+{% endblock content %}
