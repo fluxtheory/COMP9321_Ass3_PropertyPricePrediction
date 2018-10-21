@@ -17,7 +17,7 @@ import os.path
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '3141592653589793238462643383279502884197169399'    # for CSRF
 bootstrap = Bootstrap(app)
-
+userdb = UserDB()
 #ppp = PropertyPricePrediction()
 
 parser = reqparse.RequestParser()
@@ -144,7 +144,7 @@ def login():
 
             user = request.form['username']
             pw = request.form['password']
-            if(UserDB.check(User=user,Password=pw) == true):
+            if(userdb.check(User=user,Password=pw) == True):
 
             #if request.form['username'] == 'admin' and \
             #   request.form['password'] == 'password':
@@ -154,7 +154,7 @@ def login():
                 return redirect(url_for('searchpage', name=form.username.data))
             else :
                 flash('Incorrect username or password')
- 
+
     return render_template('login.html', form=form)
 
 
@@ -184,8 +184,8 @@ def searchpage():
                 "council"  : form.council.data,
                 "property_type" : form.property_type.data,
                 "distance" : float(form.distance.data),
-                "landsize" : float(form.landsize.data)    
-            }) 
+                "landsize" : float(form.landsize.data)
+            })
             if r.ok:
                 resp = r.json()
             else:
@@ -193,7 +193,7 @@ def searchpage():
                 return render_template('search.html', form=form)
 
             session.clear()
-            return redirect(url_for('resultpage', json=resp)) 
+            return redirect(url_for('resultpage', json=resp))
             #return redirect(url_for('resultpage', landsize=form.landsize.data, council=form.council.data, \
             #type=form.property_type.data, bedrooms=form.num_bedroom.data, bathrooms=form.num_bathroom.data, garage=form.num_garage.data, distance=form.distance.data))   #address=form.address.data,
         else:
@@ -202,7 +202,7 @@ def searchpage():
                 form.council.data, form.landsize.data, form.property_type.data, \
                 form.num_bedroom.data, form.num_bathroom.data, form.num_garage.data))
             flash('errors={}'.format(form.errors.items()))
-    
+
     return render_template('search.html', form=form)
 
 # search property / return results
@@ -230,8 +230,7 @@ def sign_up():
     if request.method == 'POST':
         if form.validate_on_submit():
             if(form.password.data == form.ConfirmPassword.data):
-
-                UserDB.insert(form.username.data, form.password.data)
+                userdb.insert(form.username.data, form.password.data)
                 return redirect(url_for('register_success'))
             else :
                 flash('Passwords do not match')
@@ -245,6 +244,6 @@ def register_success():
     form = RegisterForm()
     flash('You have registered successfully!')
     return render_template('register.html', form=form)
-    
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=12345)

@@ -39,12 +39,14 @@ class UserDB():
         if len(info) == 0: # insert
             c.execute("INSERT INTO UserInfo (ID, USERNAME, PASSWORD) \
               VALUES (?, ?, ?)", (self.ID, User, pwd));
+              conn.commit()
+              conn.close()
+              return True
         else:
-            c.execute("UPDATE UserInfo SET PASSWORD = ? WHERE USERNAME = ?",
-                      (pwd, User));
-        conn.commit()
-        conn.close()
-
+            conn.commit()
+            conn.close()
+            return False
+    
     def check(self, User, Password):
         conn = sqlite3.connect('user.sqlite')
         c = conn.cursor()
