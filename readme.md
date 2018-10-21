@@ -24,6 +24,8 @@ to predict the price of property in melb according to their features. Besides, U
  - ModelsTrainning
  - ModelsBagging
  - Web
+ - Auth
+ - Demo
  - GuidesOfGit.md
  - README.md
 
@@ -37,9 +39,26 @@ Dataset from [Melbourne House Market](https://www.kaggle.com/anthonypino/melbour
  - Fill Missing Data By Median or Average
 
 ### FeatureEngineering
+Data processing and feature augmentation
 
 ### ModelsTrainning
+Building multiple models
 
 ### ModelsBagging
+Merging models
 
 ### Web
+Human-computer interface
+
+## Communication Chanel
+ - mobile app Wechat in English
+ - comments on github
+
+## Repo
+[COMP9321 Ass3](https://github.com/luckybuzhi/COMP9321_Ass3_PropertyPricePrediction)
+
+## Manual
+```
+cd 8.Demo
+python3 myProperty.py
+```
