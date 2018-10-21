@@ -7,6 +7,7 @@ from flask_restplus import reqparse
 from wtforms import *
 from flask_wtf import FlaskForm
 from wtforms.validators import *
+from UserDB import UserDB
 import requests
 import json
 import unicodedata
@@ -140,8 +141,13 @@ def login():
     form = LoginForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            if request.form['username'] == 'admin' and \
-               request.form['password'] == 'password':
+
+            user = request.form['username']
+            pw = request.form['password']
+            if(UserDB.check(User=user,Password=pw) == true):
+
+            #if request.form['username'] == 'admin' and \
+            #   request.form['password'] == 'password':
                 #flash('Login requested for user {}, remember_me={}'.format(
                 #form.username.data, form.remember_me.data))
                 session.clear()
@@ -224,6 +230,8 @@ def sign_up():
     if request.method == 'POST':
         if form.validate_on_submit():
             if(form.password.data == form.ConfirmPassword.data):
+
+                UserDB.insert(form.username.data, form.password.data)
                 return redirect(url_for('register_success'))
             else :
                 flash('Passwords do not match')
@@ -235,7 +243,7 @@ def sign_up():
 @app.route('/success', methods=['GET', 'POST'])
 def register_success():
     form = RegisterForm()
-    flash('You have successfully registered!')
+    flash('You have registered successfully!')
     return render_template('register.html', form=form)
     
 if __name__ == '__main__':
