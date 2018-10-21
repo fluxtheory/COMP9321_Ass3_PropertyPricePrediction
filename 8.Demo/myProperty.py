@@ -236,9 +236,10 @@ def sign_up():
 
                 if(resp):
                     flash('You have registered successfully!')
+                    return redirect(url_for('login'))
                 else :
                     flash('This username has been taken')
-                return redirect(url_for('login'))
+                
             else :
                 flash('Passwords do not match')
 
