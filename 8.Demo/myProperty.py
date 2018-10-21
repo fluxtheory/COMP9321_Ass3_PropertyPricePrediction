@@ -217,7 +217,7 @@ def resultpage():
     return render_template('show.html', price=price, img=pic1, list=similar)
 
 
-@app.route('/register')
+@app.route('/register', methods=['GET','POST'])
 def sign_up():
     form = RegisterForm()
 
@@ -232,11 +232,11 @@ def sign_up():
 
     return render_template('register.html', form=form)
 
-@app.route('/success')
+@app.route('/success', methods=['GET', 'POST'])
 def register_success():
-    return None
-    flash()
-    return render_template()
+    form = RegisterForm()
+    flash('You have successfully registered!')
+    return render_template('register.html', form=form)
     
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=12345)
