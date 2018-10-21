@@ -17,7 +17,7 @@ import os.path
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '3141592653589793238462643383279502884197169399'    # for CSRF
 bootstrap = Bootstrap(app)
-
+userdb = UserDB()
 #ppp = PropertyPricePrediction()
 
 parser = reqparse.RequestParser()
@@ -139,12 +139,13 @@ class SearchForm(FlaskForm):
 @app.route('/', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+
     if request.method == 'POST':
         if form.validate_on_submit():
 
             user = request.form['username']
             pw = request.form['password']
-            if(UserDB.check(User=user,Password=pw) == true):
+            if(userdb.check(User=user,Password=pw)):
 
             #if request.form['username'] == 'admin' and \
             #   request.form['password'] == 'password':
@@ -231,20 +232,18 @@ def sign_up():
         if form.validate_on_submit():
             if(form.password.data == form.ConfirmPassword.data):
 
-                UserDB.insert(form.username.data, form.password.data)
-                return redirect(url_for('register_success'))
+                userdb.insert(User=form.username.data, Password=form.password.data)
+                flash('You have registered successfully!')
+                return redirect(url_for('login'))
             else :
                 flash('Passwords do not match')
+
+            #if(check for duplicate usernames):
+            #    flash('This username has been taken')
         else :
             flash('Username is invalid')
 
     return render_template('register.html', form=form)
 
-@app.route('/success', methods=['GET', 'POST'])
-def register_success():
-    form = RegisterForm()
-    flash('You have registered successfully!')
-    return render_template('register.html', form=form)
-    
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=12345)
