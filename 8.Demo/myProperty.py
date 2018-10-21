@@ -34,7 +34,7 @@ parser.add_argument('json')
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max =50)])
     password = PasswordField('Password', validators=[DataRequired()])
-    ConfirmPassword = PasswordField('ConfirmPassword', validators=[DataRequired()])
+    ConfirmPassword = PasswordField('Confirm Password', validators=[DataRequired()])
     submit = SubmitField('Register')
 
 class LoginForm(FlaskForm):
@@ -148,7 +148,7 @@ def login():
                 return redirect(url_for('searchpage', name=form.username.data))
             else :
                 flash('Incorrect username or password')
-
+ 
     return render_template('login.html', form=form)
 
 
@@ -208,14 +208,13 @@ def resultpage():
 
     price = json['price']
     pic_name = json['pic_name']
-    sim = json['similar_property']
+    similar_properties = json['similar_property']
 
     #price = "$500,000"
     #pic1 = "Average Price Of House In Different Council Area.png"
     #similar = ['test1','test2'] # list
 
-    return render_template('show.html', price=price, img=pic1, list=similar)
-
+    return render_template('show.html', price=price, img=pic_name, list=similar_properties)
 
 
 @app.route('/register', methods=['GET','POST'])
