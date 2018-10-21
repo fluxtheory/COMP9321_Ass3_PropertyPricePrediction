@@ -37,7 +37,6 @@ request_model = api.model('Prediction',
 
 @api.route('/predictionService')
 class HousePrediction(Resource):
-<<<<<<< HEAD
 
     env = []
 
