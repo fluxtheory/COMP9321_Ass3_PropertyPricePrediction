@@ -32,7 +32,7 @@ class PropertyPricePrediction():
     # Regionname       string
     # Propertycount    float64
     def __init__(self):
-        self.ds = pd.read_csv('Full.csv')
+        self.ds = pd.read_csv('FULL.csv')
         if os.path.exists('train.csv'):
             print('Clean data has been found, loading ...')
             self.train = pd.read_csv('train.csv')

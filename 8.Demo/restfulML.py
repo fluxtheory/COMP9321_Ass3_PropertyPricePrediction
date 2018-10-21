@@ -1,5 +1,6 @@
 #-*-coding:utf8-*-
-__author__ = 'Pengcheng Xie, Xavier Yan'
+
+__author__ = 'Pengcheng Xie, Xavier Yan, Hanming Yin'
 
 #from mlAPI import PropertyPricePrediction
 
@@ -36,6 +37,7 @@ request_model = api.model('Prediction',
 
 @api.route('/predictionService')
 class HousePrediction(Resource):
+<<<<<<< HEAD
 
     env = []
 
@@ -72,32 +74,19 @@ class HousePrediction(Resource):
     def get(self):
         
         predict_price = PropertyPricePrediction()
-        predict_price.setArgs(env)
+        predict_price.setArgs(self.env)
         price, pic_name, info = predict_price.predict()
         response = dict()
-        response['price'] = price
+        response["price"] = int(price)
         response['pic_name'] = pic_name
-        response['similar_property'] = info
+        for i in range(len(info)):
+            for j in range(len(info[i])):
+                info[i][j] = str(info[i][j])
+            response["property" + str(i + 1)] = info[i]
+        response = json.dumps(response)
         return response, 200
             
 
-    #def get(self)
-# @api.route('/pengcheng9321/<int:Rooms>/<string:Type>')
-# @api.param('Rooms', 'Number of rooms.')
-# @api.param('Type', 'br - bedroom(s); h - house,cottage,villa, semi,terrace; u - unit, duplex; t - townhouse; dev site - development site; o res - other residential.')
-# # @api.param('Distance', 'Distance from CBD in Kilometres.')
-# class HousePrediction(Resource):
-#     @api.response(400, 'Data invalid')
-#     @api.response(200, 'OK')
-#     # @api.doc(description="Q5: Get an economic indicator value for given country and a year")
-#     def get(self, Rooms, Type):
-#         # env = [Rooms,Type,'None','None','None', Distance,Bathrooms,Car,LandSize,CouncilArea]
-#         predict_price = PropertyPricePrediction()
-#         # predict_price.setArgs(env)
-#         # price = predict_price.predict()
-#         return {"message": "The price is {} ".format(Type)}, 200
-
-# run the application
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug = True)
+

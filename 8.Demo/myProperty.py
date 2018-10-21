@@ -148,7 +148,7 @@ def login():
                 return redirect(url_for('searchpage', name=form.username.data))
             else :
                 flash('Incorrect username or password')
- 
+
     return render_template('login.html', form=form)
 
 
@@ -215,6 +215,7 @@ def resultpage():
     #similar = ['test1','test2'] # list
 
     return render_template('show.html', price=price, img=pic1, list=similar)
+
 
 
 @app.route('/register', methods=['GET','POST'])
