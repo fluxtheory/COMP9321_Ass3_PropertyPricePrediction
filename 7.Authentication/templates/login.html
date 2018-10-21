@@ -2,7 +2,7 @@
 {% block content %}
     <div style="width:100%;text-align:center">
   <h1>Login</h1>
-  <form action="{{ url_for("Login") }}" method="post" name="Login">
+  <form action="{{ url_for("login") }}" method="post" name="login">
       {{ form.csrf_token }}
       <p>
           {{ form.username.label }}<br>
